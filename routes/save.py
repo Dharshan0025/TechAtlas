@@ -3,7 +3,7 @@ from models.decision import Decision
 from services.embedder import GeminiEmbedder
 from services.vector_store import VectorStore
 import firebase_admin
-from firebase_admin import db
+from firebase_admin import firestore
 
 save_bp = Blueprint('save', __name__)
 embedder = GeminiEmbedder()
@@ -28,16 +28,16 @@ def save_decision():
     embedding_text = decision.get_embedding_text()
     embedding = embedder.embed(embedding_text)
     
-    # Store in Pinecone
+    # Store in FAISS vector store
     vector_store.upsert(
         decision_id=decision.decision_id,
         embedding=embedding,
         metadata=decision.to_dict()
     )
     
-    # Store in Firebase
-    ref = db.reference(f'decisions/{decision.decision_id}')
-    ref.set(decision.to_dict())
+    # Store in Firestore
+    db = firestore.client()
+    db.collection('decisions').document(decision.decision_id).set(decision.to_dict())
     
     return jsonify({
         "success": True,

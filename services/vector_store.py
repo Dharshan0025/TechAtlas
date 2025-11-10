@@ -1,34 +1,69 @@
-import pinecone
-from config import Config
+import faiss
+import numpy as np
+import pickle
+import os
+from pathlib import Path
 
 class VectorStore:
     def __init__(self):
-        pinecone.init(api_key=Config.PINECONE_API_KEY, environment=Config.PINECONE_ENVIRONMENT)
-        self.index_name = Config.PINECONE_INDEX_NAME
+        self.dimension = 768  # Gemini embedding dimension
+        self.index_path = Path('data/faiss_index.bin')
+        self.metadata_path = Path('data/metadata.pkl')
         
-        # Create index if doesn't exist
-        if self.index_name not in pinecone.list_indexes():
-            pinecone.create_index(
-                name=self.index_name,
-                dimension=768,  # Gemini embedding dimension
-                metric='cosine'
-            )
+        # Create data directory if it doesn't exist
+        self.index_path.parent.mkdir(parents=True, exist_ok=True)
         
-        self.index = pinecone.Index(self.index_name)
+        # Load or create FAISS index
+        if self.index_path.exists():
+            self.index = faiss.read_index(str(self.index_path))
+            with open(self.metadata_path, 'rb') as f:
+                self.metadata_store = pickle.load(f)
+        else:
+            # Create new index with cosine similarity
+            self.index = faiss.IndexFlatIP(self.dimension)  # Inner Product for cosine
+            self.metadata_store = {}
+            self._save()
+    
+    def _save(self):
+        """Save index and metadata to disk"""
+        faiss.write_index(self.index, str(self.index_path))
+        with open(self.metadata_path, 'wb') as f:
+            pickle.dump(self.metadata_store, f)
     
     def upsert(self, decision_id: str, embedding: list[float], metadata: dict):
         """Store decision vector"""
-        self.index.upsert(vectors=[{
+        # Normalize embedding for cosine similarity
+        embedding_np = np.array([embedding], dtype=np.float32)
+        faiss.normalize_L2(embedding_np)
+        
+        # Add to index
+        self.index.add(embedding_np)
+        
+        # Store metadata with the index position
+        idx = self.index.ntotal - 1
+        self.metadata_store[idx] = {
             'id': decision_id,
-            'values': embedding,
-            'metadata': metadata
-        }])
+            **metadata
+        }
+        
+        self._save()
     
     def query(self, query_embedding: list[float], top_k: int = 3):
         """Search for similar decisions"""
-        results = self.index.query(
-            vector=query_embedding,
-            top_k=top_k,
-            include_metadata=True
-        )
-        return results['matches']
+        # Normalize query embedding
+        query_np = np.array([query_embedding], dtype=np.float32)
+        faiss.normalize_L2(query_np)
+        
+        # Search
+        distances, indices = self.index.search(query_np, min(top_k, self.index.ntotal))
+        
+        # Format results
+        matches = []
+        for dist, idx in zip(distances[0], indices[0]):
+            if idx != -1 and idx in self.metadata_store:
+                matches.append({
+                    'score': float(dist),
+                    'metadata': self.metadata_store[idx]
+                })
+        
+        return matches

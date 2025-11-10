@@ -40,7 +40,7 @@ class RAGEngine:
             context += f"Date: {metadata['created_at']}\n\n"
             
             sources.append({
-                "decision_id": match['id'],
+                "decision_id": metadata['id'],
                 "title": metadata['title'],
                 "owner": metadata['owner'],
                 "thread_link": metadata.get('thread_link', ''),

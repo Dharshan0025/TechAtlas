@@ -41,7 +41,20 @@ class DecisionDetector:
         """
         
         response = self.model.generate_content(prompt)
-        result = eval(response.text)  # Parse JSON-like response
+        
+        # Parse JSON from response (handle markdown code blocks)
+        import json
+        import re
+        
+        response_text = response.text.strip()
+        # Remove markdown code blocks if present
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response_text, re.DOTALL)
+        if json_match:
+            json_str = json_match.group(1)
+        else:
+            json_str = response_text
+        
+        result = json.loads(json_str)
         
         return (
             result.get('is_decision', False),

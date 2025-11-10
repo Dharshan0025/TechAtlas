@@ -9,9 +9,7 @@ from routes.query import query_bp
 
 # Initialize Firebase
 cred = credentials.Certificate(Config.FIREBASE_CREDENTIALS_PATH)
-firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://your-project.firebaseio.com'
-})
+firebase_admin.initialize_app(cred)
 
 # Create Flask app
 app = Flask(__name__)
