@@ -15,11 +15,21 @@ class RAGEngine:
         """
         RAG pipeline: Retrieve → Augment → Generate
         """
-        # 1. Convert query to embedding
-        query_embedding = self.embedder.embed_query(user_query)
-        
-        # 2. Retrieve similar decisions
-        matches = self.vector_store.query(query_embedding, top_k=3)
+        try:
+            # 1. Convert query to embedding
+            print(f"Embedding query: {user_query}")
+            query_embedding = self.embedder.embed_query(user_query)
+            print(f"Query embedding generated: {len(query_embedding)} dimensions")
+            
+            # 2. Retrieve similar decisions
+            print("Searching vector store...")
+            matches = self.vector_store.query(query_embedding, top_k=3)
+            print(f"Found {len(matches)} matches")
+        except Exception as e:
+            print(f"Error in RAG query: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
         
         if not matches:
             return {
@@ -40,7 +50,7 @@ class RAGEngine:
             context += f"Date: {metadata['created_at']}\n\n"
             
             sources.append({
-                "decision_id": metadata['id'],
+                "decision_id": metadata.get('decision_id', metadata.get('id', '')),
                 "title": metadata['title'],
                 "owner": metadata['owner'],
                 "thread_link": metadata.get('thread_link', ''),

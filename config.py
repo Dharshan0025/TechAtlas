@@ -6,7 +6,7 @@ load_dotenv()
 class Config:
     # Gemini API
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-    GEMINI_MODEL = 'gemini-1.5-flash'
+    GEMINI_MODEL = 'models/gemini-pro-latest'
     GEMINI_EMBEDDING_MODEL = 'models/text-embedding-004'
     
     # Firebase
