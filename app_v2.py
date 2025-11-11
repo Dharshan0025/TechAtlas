@@ -67,8 +67,14 @@ def health_check():
 @app.route('/detect-decision', methods=['POST'])
 def detect_decision():
     """API 1: Detect Decision"""
+    with open('debug.log', 'a') as f:
+        f.write("=== DETECT_DECISION START ===\n")
+
     try:
         data = request.get_json()
+        with open('debug.log', 'a') as f:
+            f.write(f"Request data: {data}\n")
+
         if not data:
             return jsonify({"error": "No JSON data provided"}), 400
 
@@ -79,11 +85,19 @@ def detect_decision():
         if not message:
             return jsonify({"error": "Message is required"}), 400
 
-        print(f"🔍 Detecting decision in: {message[:50]}...")
+        with open('debug.log', 'a') as f:
+            f.write(f"Message: {message[:50]}...\n")
+            f.write("Creating DecisionDetector...\n")
 
         # Create detector instance directly
         detector = DecisionDetector()
+        with open('debug.log', 'a') as f:
+            f.write("DecisionDetector created, calling detect()...\n")
+
         is_decision, confidence, title = detector.detect(message)
+
+        with open('debug.log', 'a') as f:
+            f.write(f"Detection result: {is_decision}, {confidence}, {title}\n")
 
         result = {
             "is_decision": is_decision,
@@ -91,10 +105,18 @@ def detect_decision():
             "suggested_title": title
         }
 
-        print(f"✅ Detection result: {result}")
+        with open('debug.log', 'a') as f:
+            f.write(f"Returning result: {result}\n")
+            f.write("=== DETECT_DECISION END ===\n")
+
         return jsonify(result)
 
     except Exception as e:
+        with open('debug.log', 'a') as f:
+            f.write(f"ERROR: {str(e)}\n")
+            f.write(f"Traceback: {traceback.format_exc()}\n")
+            f.write("=== DETECT_DECISION ERROR ===\n")
+
         print(f"❌ Error in detect_decision: {e}")
         traceback.print_exc()
         return jsonify({
@@ -199,6 +221,7 @@ def query_decisions():
 @app.route('/routes', methods=['GET'])
 def list_routes():
     """Debug endpoint to list all routes"""
+    print("ROUTES ENDPOINT CALLED")
     routes = []
     for rule in app.url_map.iter_rules():
         if rule.endpoint != 'static':
@@ -207,6 +230,7 @@ def list_routes():
                 'methods': list(rule.methods),
                 'url': str(rule)
             })
+    print(f"Found {len(routes)} routes")
     return jsonify(routes)
 
 if __name__ == '__main__':
