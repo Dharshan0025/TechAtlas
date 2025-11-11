@@ -20,13 +20,13 @@ from datetime import datetime, timezone
 from functools import wraps
 import sys
 
-# Configure logging with UTF-8 encoding for file handler
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler('techatlas_backend.log', encoding='utf-8')
+        logging.FileHandler('techatlas_backend.log')
     ]
 )
 logger = logging.getLogger(__name__)
@@ -165,9 +165,9 @@ def get_detector():
         try:
             detector = DecisionDetector()
             services_status['detector'] = True
-            logger.info("[OK] DecisionDetector initialized")
+            logger.info("✅ DecisionDetector initialized")
         except Exception as e:
-            logger.error(f"[ERROR] Failed to initialize DecisionDetector: {str(e)}")
+            logger.error(f"❌ Failed to initialize DecisionDetector: {str(e)}")
             services_status['detector'] = False
             raise
     return detector
@@ -180,9 +180,9 @@ def get_embedder():
         try:
             embedder = GeminiEmbedder()
             services_status['embedder'] = True
-            logger.info("[OK] GeminiEmbedder initialized")
+            logger.info("✅ GeminiEmbedder initialized")
         except Exception as e:
-            logger.error(f"[ERROR] Failed to initialize GeminiEmbedder: {str(e)}")
+            logger.error(f"❌ Failed to initialize GeminiEmbedder: {str(e)}")
             services_status['embedder'] = False
             raise
     return embedder
@@ -195,9 +195,9 @@ def get_vector_store():
         try:
             vector_store = VectorStore()
             services_status['vector_store'] = True
-            logger.info("[OK] VectorStore initialized")
+            logger.info("✅ VectorStore initialized")
         except Exception as e:
-            logger.error(f"[ERROR] Failed to initialize VectorStore: {str(e)}")
+            logger.error(f"❌ Failed to initialize VectorStore: {str(e)}")
             services_status['vector_store'] = False
             raise
     return vector_store
@@ -210,9 +210,9 @@ def get_rag_engine():
         try:
             rag_engine = RAGEngine()
             services_status['rag_engine'] = True
-            logger.info("[OK] RAGEngine initialized")
+            logger.info("✅ RAGEngine initialized")
         except Exception as e:
-            logger.error(f"[ERROR] Failed to initialize RAGEngine: {str(e)}")
+            logger.error(f"❌ Failed to initialize RAGEngine: {str(e)}")
             services_status['rag_engine'] = False
             raise
     return rag_engine
@@ -223,7 +223,7 @@ def get_firestore():
     try:
         return firestore.client()
     except Exception as e:
-        logger.error(f"[ERROR] Firestore client error: {str(e)}")
+        logger.error(f"❌ Firestore client error: {str(e)}")
         raise
 
 
@@ -367,7 +367,7 @@ def detect_decision():
                 status_code=400
             )
         
-        logger.info(f"Processing decision from user: {user}, channel: {channel_id}")
+        logger.info(f"🔍 Detecting decision from user: {user}, channel: {channel_id}")
         logger.debug(f"Message: {message[:100]}...")
         
         # Initialize and use detector
@@ -392,7 +392,7 @@ def detect_decision():
                 "suggested_title": str(title)
             }
             
-            logger.info(f"[OK] Detection result: is_decision={is_decision}, confidence={confidence:.2f}")
+            logger.info(f"✅ Detection result: is_decision={is_decision}, confidence={confidence:.2f}")
             
             return standardize_response(
                 success=True,
@@ -424,6 +424,7 @@ def detect_decision():
             message=str(e),
             status_code=500
         )
+
 
 @app.route('/save-decision', methods=['POST'])
 @validate_json_input(required_fields=['title', 'owner', 'rationale', 'due_date', 'thread_link'])
@@ -473,7 +474,7 @@ def save_decision():
                 status_code=400
             )
         
-        logger.info(f"[SAVE] Saving decision: {data['title']}")
+        logger.info(f"💾 Saving decision: {data['title']}")
         
         # Create decision object
         try:
@@ -500,7 +501,7 @@ def save_decision():
             embedder_instance = get_embedder()
             embedding_text = decision.get_embedding_text()
             embedding = embedder_instance.embed(embedding_text)
-            logger.info("[OK] Embedding generated")
+            logger.info("✅ Embedding generated")
         except Exception as e:
             logger.error(f"Embedding generation failed: {str(e)}", exc_info=True)
             return standardize_response(
@@ -518,7 +519,7 @@ def save_decision():
                 embedding=embedding,
                 metadata=decision.to_dict()
             )
-            logger.info("[OK] Decision stored in vector database")
+            logger.info("✅ Decision stored in vector database")
         except Exception as e:
             logger.error(f"Vector store failed: {str(e)}", exc_info=True)
             return standardize_response(
@@ -532,7 +533,7 @@ def save_decision():
         try:
             firestore_db = get_firestore()
             firestore_db.collection('decisions').document(decision.decision_id).set(decision.to_dict())
-            logger.info(f"[OK] Decision saved to Firestore: {decision.decision_id}")
+            logger.info(f"✅ Decision saved to Firestore: {decision.decision_id}")
         except Exception as e:
             logger.error(f"Firestore save failed: {str(e)}", exc_info=True)
             return standardize_response(
@@ -556,7 +557,7 @@ def save_decision():
         )
     
     except Exception as e:
-        logger.error(f"[ERROR] Error in save_decision: {str(e)}", exc_info=True)
+        logger.error(f"❌ Error in save_decision: {str(e)}", exc_info=True)
         return standardize_response(
             success=False,
             error="Failed to save decision",
@@ -602,7 +603,7 @@ def query_decisions():
                 status_code=400
             )
         
-        logger.info(f"[QUERY] Processing query from user: {user}")
+        logger.info(f"🔎 Processing query from user: {user}")
         logger.debug(f"Query: {user_query}")
         
         # Initialize RAG engine
@@ -621,7 +622,7 @@ def query_decisions():
         try:
             result = rag_engine_instance.query(user_query)
             
-            logger.info(f"[OK] Query completed with {len(result.get('sources', []))} sources")
+            logger.info(f"✅ Query completed with {len(result.get('sources', []))} sources")
             
             return standardize_response(
                 success=True,
@@ -645,7 +646,7 @@ def query_decisions():
             )
     
     except Exception as e:
-        logger.error(f"[ERROR] Error in query_decisions: {str(e)}", exc_info=True)
+        logger.error(f"❌ Error in query_decisions: {str(e)}", exc_info=True)
         return standardize_response(
             success=False,
             error="Failed to process query",
@@ -703,15 +704,16 @@ def initialize_firebase():
             cred = credentials.Certificate(Config.FIREBASE_CREDENTIALS_PATH)
             firebase_admin.initialize_app(cred)
             services_status['firebase'] = True
-            logger.info("[OK] Firebase initialized successfully")
+            logger.info("✅ Firebase initialized successfully")
             return True
         except Exception as e:
-            logger.error(f"[ERROR] Firebase initialization attempt {attempt + 1} failed: {str(e)}")
+            logger.error(f"❌ Firebase initialization attempt {attempt + 1} failed: {str(e)}")
             if attempt == max_retries - 1:
                 logger.critical("Firebase initialization failed after all retries")
                 services_status['firebase'] = False
                 return False
     return False
+
 
 if __name__ == '__main__':
     print("="*60)
@@ -724,16 +726,16 @@ if __name__ == '__main__':
         sys.exit(1)
     
     # Log configuration
-    logger.info("Configuration:")
+    logger.info(f"📋 Configuration:")
     logger.info(f"   - Port: {Config.PORT}")
     logger.info(f"   - Debug: {Config.DEBUG}")
     logger.info(f"   - Firebase: {Config.FIREBASE_CREDENTIALS_PATH}")
     
     # Log service status
-    logger.info("Service Status:")
+    logger.info("📊 Service Status:")
     for service, status in services_status.items():
-        status_text = "[OK]" if status else "[NOT READY]"
-        logger.info(f"   {status_text} {service}: {'Ready' if status else 'Not initialized'}")
+        status_icon = "✅" if status else "❌"
+        logger.info(f"   {status_icon} {service}: {'Ready' if status else 'Not initialized'}")
     
     print("="*60)
     print(f"🌐 Server starting on http://0.0.0.0:{Config.PORT}")
