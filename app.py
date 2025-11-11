@@ -29,25 +29,23 @@ except Exception as e:
     print(f"ERROR: Firebase initialization failed: {e}")
     traceback.print_exc()
 
+# Import all blueprints
 try:
+    from routes.core import core_bp
     from routes.detect import detect_bp
-    print("DEBUG: Detect blueprint imported")
-except Exception as e:
-    print(f"ERROR: Failed to import detect blueprint: {e}")
-    traceback.print_exc()
-
-try:
+    from routes.analyze import analyze_bp
     from routes.save import save_bp
-    print("DEBUG: Save blueprint imported")
-except Exception as e:
-    print(f"ERROR: Failed to import save blueprint: {e}")
-    traceback.print_exc()
-
-try:
     from routes.query import query_bp
-    print("DEBUG: Query blueprint imported")
+    from routes.decisions import decisions_bp
+    from routes.dashboard import dashboard_bp
+    from routes.users import users_bp
+    from routes.analytics import analytics_bp
+    from routes.risk import risk_bp
+    from routes.audit import audit_bp
+    from routes.dev import dev_bp
+    print("DEBUG: All blueprints imported successfully")
 except Exception as e:
-    print(f"ERROR: Failed to import query blueprint: {e}")
+    print(f"ERROR: Failed to import blueprints: {e}")
     traceback.print_exc()
 
 # Create Flask app
@@ -100,66 +98,62 @@ def log_response(response):
         logger.error(f"Error in log_response: {str(e)}")
     return response
 
-# Register blueprints
+# Register all blueprints
 print("DEBUG: Registering blueprints...")
 try:
+    # Core routes (/, /health, /routes, /version)
+    app.register_blueprint(core_bp)
+    print("DEBUG: core_bp registered")
+    
+    # Decision detection and analysis
     app.register_blueprint(detect_bp)
     print("DEBUG: detect_bp registered")
-except Exception as e:
-    print(f"ERROR: Failed to register detect_bp: {e}")
-    traceback.print_exc()
-
-try:
+    
+    app.register_blueprint(analyze_bp)
+    print("DEBUG: analyze_bp registered")
+    
+    # Decision storage
     app.register_blueprint(save_bp)
     print("DEBUG: save_bp registered")
-except Exception as e:
-    print(f"ERROR: Failed to register save_bp: {e}")
-    traceback.print_exc()
-
-try:
+    
+    # Query and search
     app.register_blueprint(query_bp)
     print("DEBUG: query_bp registered")
+    
+    # Decision CRUD operations
+    app.register_blueprint(decisions_bp)
+    print("DEBUG: decisions_bp registered")
+    
+    # Dashboard and analytics
+    app.register_blueprint(dashboard_bp)
+    print("DEBUG: dashboard_bp registered")
+    
+    # User management
+    app.register_blueprint(users_bp)
+    print("DEBUG: users_bp registered")
+    
+    # Analytics and trends
+    app.register_blueprint(analytics_bp)
+    print("DEBUG: analytics_bp registered")
+    
+    # Risk assessment
+    app.register_blueprint(risk_bp)
+    print("DEBUG: risk_bp registered")
+    
+    # Audit and export
+    app.register_blueprint(audit_bp)
+    print("DEBUG: audit_bp registered")
+    
+    # Development utilities
+    app.register_blueprint(dev_bp)
+    print("DEBUG: dev_bp registered")
+    
+    print("DEBUG: All blueprints registered successfully")
 except Exception as e:
-    print(f"ERROR: Failed to register query_bp: {e}")
+    print(f"ERROR: Failed to register blueprints: {e}")
     traceback.print_exc()
 
-print("DEBUG: All blueprints registered successfully")
-
-@app.route('/health', methods=['GET'])
-def health_check():
-    return {"status": "healthy", "service": "TechAtlas Backend"}
-
-@app.route('/routes', methods=['GET'])
-def list_routes():
-    routes = []
-    for rule in app.url_map.iter_rules():
-        routes.append({
-            'endpoint': rule.endpoint,
-            'methods': list(rule.methods),
-            'url': str(rule)
-        })
-    return jsonify(routes)
-
-# Root endpoint
-@app.route('/')
-def root():
-    """Root endpoint that provides service information and available endpoints."""
-    from flask import url_for
-    
-    endpoints = [
-        {"path": "/", "methods": ["GET"], "description": "Service information"},
-        {"path": "/health", "methods": ["GET"], "description": "Health check"},
-        {"path": "/detect-decision", "methods": ["POST"], "description": "Detect decisions in text"},
-        {"path": "/save-decision", "methods": ["POST"], "description": "Save a decision"},
-        {"path": "/query-decisions", "methods": ["POST"], "description": "Query saved decisions"}
-    ]
-    
-    return jsonify({
-        "service": "TechAtlas Backend",
-        "status": "operational",
-        "version": "1.0.0",
-        "endpoints": endpoints
-    })
+# Note: Core routes (/, /health, /routes, /version) are now handled by core_bp
 
 # Log all registered routes on startup
 def log_registered_routes():

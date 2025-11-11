@@ -6,8 +6,12 @@ load_dotenv()
 class Config:
     # Gemini API
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-    GEMINI_MODEL = 'models/gemini-pro-latest'
+    # Use gemini-1.5-flash for higher rate limits (15 RPM free tier)
+    GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'models/gemini-1.5-flash')
     GEMINI_EMBEDDING_MODEL = 'models/text-embedding-004'
+    
+    # Rate limiting
+    RATE_LIMIT_DELAY = float(os.getenv('RATE_LIMIT_DELAY', '4.0'))  # Seconds between API calls
     
     # Firebase
     FIREBASE_CREDENTIALS_PATH = os.getenv('FIREBASE_CREDENTIALS_PATH')
