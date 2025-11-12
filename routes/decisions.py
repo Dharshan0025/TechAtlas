@@ -2,9 +2,37 @@ from flask import Blueprint, request, jsonify
 from firebase_admin import firestore
 import logging
 from datetime import datetime, timezone
+from services.embedder import GeminiEmbedder
+from services.vector_store import VectorStore
+from services.audit_logger import AuditLogger
+from utils.text_processing import process_text
+from utils.text_processing import process_text
 
 decisions_bp = Blueprint('decisions', __name__)
 logger = logging.getLogger(__name__)
+
+# Initialize services with lazy loading
+embedder = None
+vector_store = None
+audit_logger = None
+
+def get_embedder():
+    global embedder
+    if embedder is None:
+        embedder = GeminiEmbedder()
+    return embedder
+
+def get_vector_store():
+    global vector_store
+    if vector_store is None:
+        vector_store = VectorStore()
+    return vector_store
+
+def get_audit_logger():
+    global audit_logger
+    if audit_logger is None:
+        audit_logger = AuditLogger()
+    return audit_logger
 
 @decisions_bp.route('/decisions', methods=['GET'])
 def list_decisions():
@@ -83,6 +111,11 @@ def get_decision(decision_id):
         decision_data = doc.to_dict()
         decision_data['id'] = doc.id
         
+        # Log audit event
+        user = request.args.get('user', 'system')
+        audit = get_audit_logger()
+        audit.log_decision_viewed(decision_id, user)
+        
         return jsonify({
             "success": True,
             "decision": decision_data,
@@ -115,20 +148,44 @@ def update_decision(decision_id):
         
         # Check if decision exists
         doc_ref = db.collection('decisions').document(decision_id)
-        doc = doc_ref.get()
+        original_doc = doc_ref.get()
         
-        if not doc.exists:
+        if not original_doc.exists:
             return jsonify({
                 "success": False,
                 "error": "Decision not found",
                 "status": 404
             }), 404
-        
+            
+        original_data = original_doc.to_dict()
+
         # Update allowed fields
         allowed_fields = ['title', 'rationale', 'status', 'due_date', 'participants', 'owner']
         update_data = {k: v for k, v in data.items() if k in allowed_fields}
         update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
         
+        # Log history
+        changes = {}
+        for key, value in update_data.items():
+            if key != 'updated_at' and original_data.get(key) != value:
+                changes[key] = {
+                    'old': original_data.get(key),
+                    'new': value
+                }
+
+        if changes:
+            history_ref = doc_ref.collection('history').document()
+            history_ref.set({
+                'timestamp': update_data['updated_at'],
+                'user': data.get('user', 'system'), # Assumes user is passed in request
+                'action': 'updated',
+                'changes': changes
+            })
+            
+            # Log audit event
+            audit = get_audit_logger()
+            audit.log_decision_updated(decision_id, data.get('user', 'system'), changes)
+
         doc_ref.update(update_data)
         
         # Get updated decision
@@ -173,6 +230,11 @@ def delete_decision(decision_id):
             'status': 'Archived',
             'deleted_at': datetime.now(timezone.utc).isoformat()
         })
+        
+        # Log audit event
+        user = request.get_json(silent=True).get('user', 'system') if request.is_json else 'system'
+        audit = get_audit_logger()
+        audit.log_decision_deleted(decision_id, user)
         
         return jsonify({
             "success": True,
@@ -221,18 +283,35 @@ def change_status(decision_id):
         
         db = firestore.client()
         doc_ref = db.collection('decisions').document(decision_id)
-        doc = doc_ref.get()
+        original_doc = doc_ref.get()
         
-        if not doc.exists:
+        if not original_doc.exists:
             return jsonify({
                 "success": False,
                 "error": "Decision not found",
                 "status": 404
             }), 404
+            
+        original_data = original_doc.to_dict()
         
+        update_time = datetime.now(timezone.utc).isoformat()
         doc_ref.update({
             'status': new_status,
-            'status_updated_at': datetime.now(timezone.utc).isoformat()
+            'status_updated_at': update_time
+        })
+        
+        # Log history
+        history_ref = doc_ref.collection('history').document()
+        history_ref.set({
+            'timestamp': update_time,
+            'user': data.get('user', 'system'), # Assumes user is passed in request
+            'action': 'status_changed',
+            'changes': {
+                'status': {
+                    'old': original_data.get('status'),
+                    'new': new_status
+                }
+            }
         })
         
         return jsonify({
@@ -256,20 +335,17 @@ def change_status(decision_id):
 def decision_history(decision_id):
     """Get change log for a decision"""
     try:
-        # TODO: Implement actual history tracking
-        # For now, return placeholder
+        db = firestore.client()
+        history_query = db.collection('decisions').document(decision_id).collection('history').order_by('timestamp', direction=firestore.Query.DESCENDING).stream()
         
+        history = []
+        for doc in history_query:
+            history.append(doc.to_dict())
+            
         return jsonify({
             "success": True,
             "decision_id": decision_id,
-            "history": [
-                {
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
-                    "user": "system",
-                    "action": "created",
-                    "changes": {}
-                }
-            ],
+            "history": history,
             "status": 200
         }), 200
         
@@ -287,13 +363,41 @@ def decision_history(decision_id):
 def related_decisions(decision_id):
     """Find semantically similar decisions"""
     try:
-        # TODO: Implement vector similarity search
-        # For now, return placeholder
+        db = firestore.client()
+        doc = db.collection('decisions').document(decision_id).get()
         
+        if not doc.exists:
+            return jsonify({"success": False, "error": "Decision not found", "status": 404}), 404
+            
+        decision_data = doc.to_dict()
+        
+        # Generate embedding for the current decision
+        embedder_instance = get_embedder()
+        embedding_text = f"{decision_data.get('title', '')}\n{decision_data.get('rationale', '')}"
+        embedding = embedder_instance.embed(embedding_text)
+        
+        # Query for similar decisions
+        vector_store_instance = get_vector_store()
+        # Query for more results to filter out the original decision
+        similar_decisions = vector_store_instance.query(embedding, top_k=4)
+        
+        # Filter out the original decision and format results
+        related = []
+        for item in similar_decisions:
+            if item['metadata']['id'] != decision_id:
+                related.append({
+                    'id': item['metadata']['id'],
+                    'title': item['metadata']['title'],
+                    'score': item['score']
+                })
+        
+        # Ensure we return at most 3
+        related = related[:3]
+
         return jsonify({
             "success": True,
             "decision_id": decision_id,
-            "related_decisions": [],
+            "related_decisions": related,
             "status": 200
         }), 200
         
@@ -338,18 +442,26 @@ def search_decisions():
         
         # Execute query
         results = []
+        processed_keyword = process_text(keyword) if keyword else []
+
         for doc in query.stream():
             decision_data = doc.to_dict()
             decision_data['id'] = doc.id
             
-            # Simple keyword filter (TODO: improve with full-text search)
-            if keyword:
-                if keyword.lower() in decision_data.get('title', '').lower() or \
-                   keyword.lower() in decision_data.get('rationale', '').lower():
-                    results.append(decision_data)
-            else:
+            if not keyword:
                 results.append(decision_data)
-        
+                continue
+
+            # Improved keyword filter
+            title_text = decision_data.get('title', '')
+            rationale_text = decision_data.get('rationale', '')
+            
+            decision_text = f"{title_text} {rationale_text}"
+            processed_decision_text = process_text(decision_text)
+            
+            if any(kw in processed_decision_text for kw in processed_keyword):
+                results.append(decision_data)
+
         return jsonify({
             "success": True,
             "count": len(results),

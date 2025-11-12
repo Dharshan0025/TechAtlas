@@ -5,9 +5,27 @@ from datetime import datetime, timezone
 import csv
 import json
 from io import StringIO
+from services.audit_logger import AuditLogger
+from services.notification_manager import NotificationManager
 
 audit_bp = Blueprint('audit', __name__)
 logger = logging.getLogger(__name__)
+
+# Initialize services with lazy loading
+audit_logger = None
+notification_manager = None
+
+def get_audit_logger():
+    global audit_logger
+    if audit_logger is None:
+        audit_logger = AuditLogger()
+    return audit_logger
+
+def get_notification_manager():
+    global notification_manager
+    if notification_manager is None:
+        notification_manager = NotificationManager()
+    return notification_manager
 
 @audit_bp.route('/audit-logs', methods=['GET'])
 def get_audit_logs():
@@ -18,18 +36,14 @@ def get_audit_logs():
         action_type = request.args.get('action_type')
         limit = int(request.args.get('limit', 100))
         
-        # TODO: Implement actual audit log collection
-        # For now, return placeholder structure
-        
-        logs = [
-            {
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "user": "system",
-                "action": "system_start",
-                "resource": "application",
-                "details": "System initialized"
-            }
-        ]
+        filters = {}
+        if user:
+            filters['user'] = user
+        if action_type:
+            filters['action'] = action_type
+            
+        audit = get_audit_logger()
+        logs = audit.get_audit_logs(filters=filters, limit=limit)
         
         return jsonify({
             "success": True,
@@ -131,19 +145,40 @@ def send_reminder():
                 "error": "decision_id and recipient_email are required",
                 "status": 400
             }), 400
+            
+        # Get decision data
+        db = firestore.client()
+        doc_ref = db.collection('decisions').document(decision_id)
+        doc = doc_ref.get()
         
-        # TODO: Implement actual reminder sending (email/notification)
-        # For now, just log it
+        if not doc.exists:
+            return jsonify({
+                "success": False,
+                "error": "Decision not found",
+                "status": 404
+            }), 404
+            
+        decision_data = doc.to_dict()
         
-        logger.info(f"Reminder sent for decision {decision_id} to {recipient_email}")
+        # Send reminder
+        manager = get_notification_manager()
+        result = manager.send_due_date_reminder(decision_data, recipient_email)
         
-        return jsonify({
-            "success": True,
-            "decision_id": decision_id,
-            "recipient": recipient_email,
-            "reminder_sent_at": datetime.now(timezone.utc).isoformat(),
-            "status": 200
-        }), 200
+        if result.get('success'):
+            return jsonify({
+                "success": True,
+                "decision_id": decision_id,
+                "recipient": recipient_email,
+                "reminder_sent_at": result.get('sent_at'),
+                "status": 200
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Failed to send reminder",
+                "message": result.get('error'),
+                "status": 500
+            }), 500
         
     except Exception as e:
         logger.error(f"Error sending reminder: {str(e)}", exc_info=True)

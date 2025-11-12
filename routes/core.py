@@ -33,24 +33,48 @@ def root():
 @core_bp.route('/health', methods=['GET'])
 def health_check():
     """Health check with component status"""
+    services = {}
+    
+    # Check Firebase
     try:
-        # Check Firebase
         from firebase_admin import firestore
         db = firestore.client()
         db.collection('health').document('check').get()
-        firebase_status = True
+        services["firebase"] = True
     except Exception as e:
         logger.warning(f"Firebase health check failed: {str(e)}")
-        firebase_status = False
-    
-    # Check other services
-    services = {
-        "firebase": firebase_status,
-        "vector_store": True,  # TODO: Add actual check
-        "gemini_ai": True,     # TODO: Add actual check
-        "embedder": True       # TODO: Add actual check
-    }
-    
+        services["firebase"] = False
+
+    # Check Vector Store
+    try:
+        from services.vector_store import VectorStore
+        vector_store = VectorStore()
+        services["vector_store"] = vector_store.index.ntotal > 0
+    except Exception as e:
+        logger.warning(f"Vector Store health check failed: {str(e)}")
+        services["vector_store"] = False
+
+    # Check Gemini AI
+    try:
+        from services.feasibility_analyzer import FeasibilityAnalyzer
+        analyzer = FeasibilityAnalyzer()
+        # A simple prompt to check connectivity
+        analyzer.model.generate_content("test")
+        services["gemini_ai"] = True
+    except Exception as e:
+        logger.warning(f"Gemini AI health check failed: {str(e)}")
+        services["gemini_ai"] = False
+
+    # Check Embedder
+    try:
+        from services.embedder import GeminiEmbedder
+        embedder = GeminiEmbedder()
+        embedding = embedder.embed("test")
+        services["embedder"] = len(embedding) == 768
+    except Exception as e:
+        logger.warning(f"Embedder health check failed: {str(e)}")
+        services["embedder"] = False
+
     is_healthy = all(services.values())
     
     return jsonify({

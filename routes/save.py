@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from models.decision import Decision
 from services.embedder import GeminiEmbedder
 from services.vector_store import VectorStore
+from services.audit_logger import AuditLogger
 import firebase_admin
 from firebase_admin import firestore
 import logging
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 # Initialize services with lazy loading
 embedder = None
 vector_store = None
+audit_logger = None
 
 def get_embedder():
     global embedder
@@ -25,6 +27,12 @@ def get_vector_store():
     if vector_store is None:
         vector_store = VectorStore()
     return vector_store
+
+def get_audit_logger():
+    global audit_logger
+    if audit_logger is None:
+        audit_logger = AuditLogger()
+    return audit_logger
 
 @save_bp.route('/save-decision', methods=['POST'])
 def save_decision():
@@ -119,8 +127,24 @@ def save_decision():
         # Store in Firestore
         try:
             db = firestore.client()
-            db.collection('decisions').document(decision.decision_id).set(decision.to_dict())
+            doc_ref = db.collection('decisions').document(decision.decision_id)
+            doc_ref.set(decision.to_dict())
             logger.info(f"Decision saved to Firestore: {decision.decision_id}")
+
+            # Add creation event to history
+            history_ref = doc_ref.collection('history').document()
+            history_ref.set({
+                'timestamp': decision.created_at,
+                'user': decision.owner,
+                'action': 'created',
+                'changes': decision.to_dict()
+            })
+            logger.info(f"Creation history added for decision: {decision.decision_id}")
+
+            # Log audit event
+            audit = get_audit_logger()
+            audit.log_decision_created(decision.decision_id, decision.owner, decision.to_dict())
+
         except Exception as e:
             logger.error(f"Firestore save failed: {str(e)}", exc_info=True)
             return jsonify({

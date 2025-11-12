@@ -1,9 +1,35 @@
 from flask import Blueprint, request, jsonify
 import logging
 from datetime import datetime, timezone
+from services.feasibility_analyzer import FeasibilityAnalyzer
+from services.vector_store import VectorStore
+from services.embedder import GeminiEmbedder
 
 analyze_bp = Blueprint('analyze', __name__)
 logger = logging.getLogger(__name__)
+
+# Initialize services with lazy loading
+feasibility_analyzer = None
+vector_store = None
+embedder = None
+
+def get_feasibility_analyzer():
+    global feasibility_analyzer
+    if feasibility_analyzer is None:
+        feasibility_analyzer = FeasibilityAnalyzer()
+    return feasibility_analyzer
+
+def get_vector_store():
+    global vector_store
+    if vector_store is None:
+        vector_store = VectorStore()
+    return vector_store
+
+def get_embedder():
+    global embedder
+    if embedder is None:
+        embedder = GeminiEmbedder()
+    return embedder
 
 @analyze_bp.route('/analyze-decision', methods=['POST'])
 def analyze_decision():
@@ -41,41 +67,27 @@ def analyze_decision():
         
         logger.info(f"Analyzing decision: {title}")
         
-        # TODO: Implement actual AI analysis using Gemini
-        # For now, return structured placeholder response
+        # Find similar past decisions
+        embedder_instance = get_embedder()
+        embedding_text = f"{title}\n{rationale}"
+        embedding = embedder_instance.embed(embedding_text)
         
-        analysis = {
-            "strengths": [
-                "Clear rationale provided",
-                "Aligns with current technology trends",
-                "Potential for improved performance"
-            ],
-            "risks": [
-                "Implementation complexity",
-                "Team learning curve",
-                "Migration effort required"
-            ],
-            "alternatives": [
-                {
-                    "option": "Incremental approach",
-                    "pros": "Lower risk, easier rollback",
-                    "cons": "Slower implementation"
-                },
-                {
-                    "option": "Maintain current solution",
-                    "pros": "No migration cost",
-                    "cons": "Technical debt accumulation"
-                }
-            ],
-            "past_decisions": [
-                # TODO: Query vector store for similar decisions
-            ],
-            "recommendation": "Proceed with caution. Consider starting with a pilot project to validate assumptions.",
-            "feasibility_score": 7.5,
-            "confidence": 0.85,
-            "analyzed_at": datetime.now(timezone.utc).isoformat()
-        }
+        vector_store_instance = get_vector_store()
+        similar_decisions_raw = vector_store_instance.query(embedding, top_k=3)
         
+        past_decisions = []
+        for item in similar_decisions_raw:
+            past_decisions.append({
+                "title": item['metadata']['title'],
+                "status": item['metadata'].get('status', 'Unknown'),
+                "similarity_score": item['score']
+            })
+
+        # Perform analysis
+        analyzer = get_feasibility_analyzer()
+        analysis = analyzer.analyze_with_history(title, rationale, context, past_decisions)
+        analysis['analyzed_at'] = datetime.now(timezone.utc).isoformat()
+
         return jsonify({
             "success": True,
             "analysis": analysis,

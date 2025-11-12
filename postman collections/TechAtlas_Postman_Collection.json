@@ -361,15 +361,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/decisions/high-risk?threshold=7",
+              "raw": "{{baseUrl}}/decisions/high-risk",
               "host": ["{{baseUrl}}"],
-              "path": ["decisions", "high-risk"],
-              "query": [
-                {
-                  "key": "threshold",
-                  "value": "7"
-                }
-              ]
+              "path": ["decisions", "high-risk"]
             }
           }
         },
@@ -379,9 +373,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/dashboard/recent?days=30",
+              "raw": "{{baseUrl}}/decisions/recent?days=30",
               "host": ["{{baseUrl}}"],
-              "path": ["dashboard", "recent"],
+              "path": ["decisions", "recent"],
               "query": [
                 {
                   "key": "days",
@@ -397,9 +391,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/dashboard/by-owner",
+              "raw": "{{baseUrl}}/decisions/by-owner/:owner_email",
               "host": ["{{baseUrl}}"],
-              "path": ["dashboard", "by-owner"]
+              "path": ["decisions", "by-owner", ":owner_email"],
+              "variable": [
+                {
+                  "key": "owner_email",
+                  "value": "dev@example.com"
+                }
+              ]
             }
           }
         },
@@ -409,9 +409,15 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/dashboard/by-channel",
+              "raw": "{{baseUrl}}/decisions/by-channel/:channel_id",
               "host": ["{{baseUrl}}"],
-              "path": ["dashboard", "by-channel"]
+              "path": ["decisions", "by-channel", ":channel_id"],
+              "variable": [
+                {
+                  "key": "channel_id",
+                  "value": "tech-team"
+                }
+              ]
             }
           }
         },
@@ -421,12 +427,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/dashboard/aging?threshold_days=60",
+              "raw": "{{baseUrl}}/decisions/aging?days_threshold=60",
               "host": ["{{baseUrl}}"],
-              "path": ["dashboard", "aging"],
+              "path": ["decisions", "aging"],
               "query": [
                 {
-                  "key": "threshold_days",
+                  "key": "days_threshold",
                   "value": "60"
                 }
               ]
@@ -439,12 +445,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/dashboard/upcoming-due?days=7",
+              "raw": "{{baseUrl}}/decisions/upcoming-due?days_ahead=7",
               "host": ["{{baseUrl}}"],
-              "path": ["dashboard", "upcoming-due"],
+              "path": ["decisions", "upcoming-due"],
               "query": [
                 {
-                  "key": "days",
+                  "key": "days_ahead",
                   "value": "7"
                 }
               ]
@@ -510,12 +516,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/profile/:email",
+              "raw": "{{baseUrl}}/users/:user_email",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "profile", ":email"],
+              "path": ["users", ":user_email"],
               "variable": [
                 {
-                  "key": "email",
+                  "key": "user_email",
                   "value": "dev@example.com"
                 }
               ]
@@ -523,20 +529,14 @@
           }
         },
         {
-          "name": "User Expertise",
+          "name": "Expertise Map",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/expertise/:email",
+              "raw": "{{baseUrl}}/expertise",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "expertise", ":email"],
-              "variable": [
-                {
-                  "key": "email",
-                  "value": "dev@example.com"
-                }
-              ]
+              "path": ["expertise"]
             }
           }
         },
@@ -564,9 +564,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/knowledge-gaps",
+              "raw": "{{baseUrl}}/knowledge-gaps",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "knowledge-gaps"]
+              "path": ["knowledge-gaps"]
             }
           }
         }
@@ -590,9 +590,15 @@
               "raw": "{\n  \"decision_id\": \"550e8400-e29b-41d4-a716-446655440000\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/assess-risk",
+              "raw": "{{baseUrl}}/assess-risk/:decision_id",
               "host": ["{{baseUrl}}"],
-              "path": ["assess-risk"]
+              "path": ["assess-risk", ":decision_id"],
+              "variable": [
+                {
+                  "key": "decision_id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
             }
           }
         },
@@ -611,9 +617,9 @@
               "raw": "{\n  \"status\": \"Open\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/assess-risk/reassess",
+              "raw": "{{baseUrl}}/decisions/reassess-all-risks",
               "host": ["{{baseUrl}}"],
-              "path": ["assess-risk", "reassess"]
+              "path": ["decisions", "reassess-all-risks"]
             }
           }
         }
@@ -643,21 +649,22 @@
         {
           "name": "Export Decisions",
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"format\": \"csv\",\n  \"filters\": {\n    \"status\": \"Completed\"\n  }\n}"
-            },
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/export/decisions",
+              "raw": "{{baseUrl}}/export/decisions?format=csv&status=Completed",
               "host": ["{{baseUrl}}"],
-              "path": ["export", "decisions"]
+              "path": ["export", "decisions"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "csv"
+                },
+                {
+                  "key": "status",
+                  "value": "Completed"
+                }
+              ]
             }
           }
         },
@@ -673,7 +680,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"days_before_due\": 7\n}"
+              "raw": "{\n  \"decision_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"recipient_email\": \"user@example.com\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/reminders/send",
@@ -723,8 +730,17 @@
         {
           "name": "Validate Embeddings",
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"This is a test sentence for embedding validation.\"\n}"
+            },
             "url": {
               "raw": "{{baseUrl}}/dev/validate-embeddings",
               "host": ["{{baseUrl}}"],
@@ -733,14 +749,14 @@
           }
         },
         {
-          "name": "Reindex Vector Store",
+          "name": "Development Stats",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/dev/reindex",
+              "raw": "{{baseUrl}}/dev/stats",
               "host": ["{{baseUrl}}"],
-              "path": ["dev", "reindex"]
+              "path": ["dev", "stats"]
             }
           }
         }

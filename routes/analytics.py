@@ -3,6 +3,14 @@ from firebase_admin import firestore
 import logging
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import nltk
+
+# Download VADER lexicon if not already present
+try:
+    nltk.data.find('sentiment/vader_lexicon.zip')
+except Exception:
+    nltk.download('vader_lexicon')
 
 analytics_bp = Blueprint('analytics', __name__)
 logger = logging.getLogger(__name__)
@@ -81,15 +89,23 @@ def topic_analysis():
                 if len(word) > 4:  # Filter short words
                     topic_counts[word] += 1
         
-        # Sort by frequency
-        topics = [
-            {
+        # Sort by frequency and perform sentiment analysis
+        sia = SentimentIntensityAnalyzer()
+        topics = []
+        for topic, count in sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)[:20]:
+            sentiment_score = sia.polarity_scores(topic)['compound']
+            if sentiment_score >= 0.05:
+                sentiment = "positive"
+            elif sentiment_score <= -0.05:
+                sentiment = "negative"
+            else:
+                sentiment = "neutral"
+            
+            topics.append({
                 "topic": topic,
                 "frequency": count,
-                "sentiment": "neutral"  # TODO: Add sentiment analysis
-            }
-            for topic, count in sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)[:20]
-        ]
+                "sentiment": sentiment
+            })
         
         return jsonify({
             "success": True,
