@@ -73,7 +73,20 @@ def analyze_decision():
         embedding = embedder_instance.embed(embedding_text)
         
         vector_store_instance = get_vector_store()
-        similar_decisions_raw = vector_store_instance.query(embedding, top_k=3)
+        # Safely query vector store (handle empty index and cap top_k)
+        try:
+            if hasattr(vector_store_instance, 'index') and vector_store_instance.index is not None:
+                total_items = vector_store_instance.index.ntotal if hasattr(vector_store_instance.index, 'ntotal') else 0
+                if total_items > 0:
+                    safe_top_k = min(3, total_items)
+                    similar_decisions_raw = vector_store_instance.query(embedding, top_k=safe_top_k)
+                else:
+                    similar_decisions_raw = []
+            else:
+                similar_decisions_raw = []
+        except Exception as e:
+            logger.warning(f"Vector store query failed: {str(e)}")
+            similar_decisions_raw = []
         
         past_decisions = []
         for item in similar_decisions_raw:

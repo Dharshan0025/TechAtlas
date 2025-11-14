@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from firebase_admin import firestore
 import logging
 from datetime import datetime, timezone
+import time
 from services.embedder import GeminiEmbedder
 from services.vector_store import VectorStore
 from services.audit_logger import AuditLogger
@@ -476,4 +477,90 @@ def search_decisions():
             "error": "Search failed",
             "message": str(e),
             "status": 500
+        }), 500
+
+
+@decisions_bp.route('/decisions/bulk', methods=['POST'])
+def create_bulk_decisions():
+    """
+    Create multiple decisions in a single batch request
+    Request body: {"decisions": [...]}
+    Returns: {"success": true, "created": N, "decision_ids": [...]} 
+    """
+    try:
+        data = request.get_json()
+        decisions_data = data.get('decisions', [])
+        
+        # Validation
+        if not decisions_data or not isinstance(decisions_data, list):
+            return jsonify({
+                "success": False,
+                "error": "Invalid request: 'decisions' array required"
+            }), 400
+        
+        if len(decisions_data) == 0:
+            return jsonify({
+                "success": False,
+                "error": "At least one decision required"
+            }), 400
+        
+        if len(decisions_data) > 50:
+            return jsonify({
+                "success": False,
+                "error": "Maximum 50 decisions allowed per bulk request"
+            }), 400
+        
+        # Process each decision
+        db = firestore.client()
+        created_ids = []
+        
+        for idx, decision in enumerate(decisions_data):
+            # Generate unique decision ID (add small delay to ensure uniqueness)
+            if idx > 0:
+                time.sleep(0.001)  # 1ms delay between IDs
+            timestamp_ms = int(datetime.utcnow().timestamp() * 1000)
+            decision_id = f"dec_{timestamp_ms}"
+            
+            # Prepare decision data with defaults
+            now_iso = datetime.utcnow().isoformat() + "+00:00"
+            decision_data = {
+                'decision_id': decision_id,
+                'title': decision.get('title', ''),
+                'owner': decision.get('owner', 'system'),
+                'rationale': decision.get('rationale', ''),
+                'status': decision.get('status', 'Open'),
+                'risk_score': decision.get('risk_score', 5),
+                'participants': decision.get('participants', []),
+                'channel_id': decision.get('channel_id', ''),
+                'thread_link': decision.get('thread_link', ''),
+                'due_date': decision.get('due_date', ''),
+                'created_at': now_iso,
+                'updated_at': now_iso,
+                'history': [{
+                    'action': 'created',
+                    'timestamp': now_iso,
+                    'user': 'system',
+                    'changes': {}
+                }]
+            }
+            
+            # Save to Firestore
+            db.collection('decisions').document(decision_id).set(decision_data)
+            
+            created_ids.append(decision_id)
+        
+        # Return success response
+        response = {
+            "success": True,
+            "created": len(created_ids),
+            "decision_ids": created_ids
+        }
+        
+        return jsonify(response), 201
+        
+    except Exception as e:
+        logger.error(f"Bulk creation failed: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": f"Bulk creation failed: {str(e)}"
         }), 500

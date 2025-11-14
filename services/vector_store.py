@@ -3,6 +3,7 @@ import numpy as np
 import pickle
 import os
 from pathlib import Path
+import logging
 
 class VectorStore:
     def __init__(self):
@@ -50,20 +51,38 @@ class VectorStore:
     
     def query(self, query_embedding: list[float], top_k: int = 3):
         """Search for similar decisions"""
-        # Normalize query embedding
-        query_np = np.array([query_embedding], dtype=np.float32)
-        faiss.normalize_L2(query_np)
-        
-        # Search
-        distances, indices = self.index.search(query_np, min(top_k, self.index.ntotal))
-        
-        # Format results
-        matches = []
-        for dist, idx in zip(distances[0], indices[0]):
-            if idx != -1 and idx in self.metadata_store:
-                matches.append({
-                    'score': float(dist),
-                    'metadata': self.metadata_store[idx]
-                })
-        
-        return matches
+        try:
+            # Validate index
+            if not hasattr(self, 'index') or self.index is None or not hasattr(self.index, 'ntotal'):
+                logging.getLogger(__name__).warning("FAISS index not initialized")
+                return []
+
+            if self.index.ntotal == 0:
+                logging.getLogger(__name__).warning("FAISS index is empty")
+                return []
+
+            # Cap k to available items
+            safe_k = min(max(int(top_k), 1), self.index.ntotal)
+            if safe_k <= 0:
+                return []
+
+            # Normalize query embedding
+            query_np = np.array([query_embedding], dtype=np.float32)
+            faiss.normalize_L2(query_np)
+
+            # Search
+            distances, indices = self.index.search(query_np, safe_k)
+
+            # Format results
+            matches = []
+            for dist, idx in zip(distances[0], indices[0]):
+                if idx != -1 and idx in self.metadata_store:
+                    matches.append({
+                        'score': float(dist),
+                        'metadata': self.metadata_store[idx]
+                    })
+
+            return matches
+        except Exception as e:
+            logging.getLogger(__name__).error(f"Error in vector store query: {str(e)}")
+            return []

@@ -3,21 +3,18 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 
-# Download necessary NLTK data
-try:
-    stopwords.words('english')
-except LookupError:
-    nltk.download('stopwords')
-
+# Download necessary NLTK data (Railway-friendly)
 try:
     nltk.data.find('tokenizers/punkt')
+    nltk.data.find('corpora/stopwords')
 except LookupError:
-    nltk.download('punkt')
-
-try:
-    nltk.data.find('tokenizers/punkt_tab')
-except LookupError:
-    nltk.download('punkt_tab')
+    try:
+        print("Downloading NLTK data...")
+        nltk.download('punkt', quiet=True)
+        nltk.download('stopwords', quiet=True)
+    except Exception as e:
+        print(f'WARNING: NLTK download failed: {e}')
+        # Continue anyway, functions will handle missing data
 
 def process_text(text):
     """

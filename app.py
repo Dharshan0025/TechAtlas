@@ -4,6 +4,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from config import Config
 import traceback
+import json
 import logging
 from datetime import datetime, timezone
 
@@ -22,7 +23,17 @@ print("DEBUG: Starting Flask app initialization...")
 try:
     # Initialize Firebase
     print("DEBUG: Initializing Firebase...")
-    cred = credentials.Certificate(Config.FIREBASE_CREDENTIALS_PATH)
+    
+    # Get credentials from Config (supports both JSON and file path)
+    firebase_creds = Config.get_firebase_credentials()
+    
+    # If it's a dictionary (from JSON string), use it directly
+    if isinstance(firebase_creds, dict):
+        cred = credentials.Certificate(firebase_creds)
+    # If it's a file path string, use it
+    else:
+        cred = credentials.Certificate(firebase_creds)
+    
     firebase_admin.initialize_app(cred)
     print("DEBUG: Firebase initialized successfully")
 except Exception as e:
