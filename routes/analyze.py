@@ -102,3 +102,75 @@ def analyze_decision():
             "message": str(e),
             "status": 500
         }), 500
+
+
+@analyze_bp.route('/decisions/<decision_id>/analyze', methods=['POST'])
+def analyze_saved_decision(decision_id):
+    """
+    Analyze an existing saved decision by ID
+    """
+    try:
+        from firebase_admin import firestore
+        db = firestore.client()
+        
+        # 1. Fetch decision
+        doc_ref = db.collection('decisions').document(decision_id)
+        doc = doc_ref.get()
+        
+        if not doc.exists:
+            return jsonify({
+                "success": False,
+                "error": "Decision not found",
+                "status": 404
+            }), 404
+            
+        decision_data = doc.to_dict()
+        title = decision_data.get('title')
+        rationale = decision_data.get('rationale')
+        
+        # 2. Analyze
+        # Find similar past decisions for context
+        embedder_instance = get_embedder()
+        embedding_text = f"{title}\n{rationale}"
+        embedding = embedder_instance.embed(embedding_text)
+        
+        vector_store_instance = get_vector_store()
+        similar_decisions_raw = vector_store_instance.query(embedding, top_k=3)
+        
+        past_decisions = []
+        for item in similar_decisions_raw:
+            # Exclude self if found
+            if item['id'] == decision_id:
+                continue
+                
+            past_decisions.append({
+                "title": item['metadata']['title'],
+                "status": item['metadata'].get('status', 'Unknown'),
+                "similarity_score": item['score']
+            })
+
+        analyzer = get_feasibility_analyzer()
+        analysis = analyzer.analyze_with_history(title, rationale, "", past_decisions)
+        analysis['analyzed_at'] = datetime.now(timezone.utc).isoformat()
+        
+        # 3. Update decision with analysis
+        doc_ref.update({
+            'analysis': analysis,
+            'last_analyzed_at': analysis['analyzed_at']
+        })
+        
+        return jsonify({
+            "success": True,
+            "decision_id": decision_id,
+            "analysis": analysis,
+            "status": 200
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error analyzing saved decision: {str(e)}", exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "Analysis failed",
+            "message": str(e),
+            "status": 500
+        }), 500
