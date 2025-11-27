@@ -1,0 +1,766 @@
+{
+  "info": {
+    "name": "TechAtlas Backend API - Production",
+    "description": "Complete API collection for TechAtlas Decision Intelligence Platform - Production Environment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "2.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://techatlas-production.up.railway.app",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Core Routes",
+      "item": [
+        {
+          "name": "Service Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "List All Routes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/routes",
+              "host": ["{{baseUrl}}"],
+              "path": ["routes"]
+            }
+          }
+        },
+        {
+          "name": "API Version",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/version",
+              "host": ["{{baseUrl}}"],
+              "path": ["version"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Decision Detection & Analysis",
+      "item": [
+        {
+          "name": "Detect Decision",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"We decided to migrate to PostgreSQL for better performance\",\n  \"user\": \"dev@example.com\",\n  \"channel_id\": \"tech-team\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/detect-decision",
+              "host": ["{{baseUrl}}"],
+              "path": ["detect-decision"]
+            }
+          }
+        },
+        {
+          "name": "Analyze Feasibility",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Migrate to PostgreSQL\",\n  \"rationale\": \"Need better join performance and ACID compliance\",\n  \"context\": \"Currently using MySQL with 100GB database\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analyze-decision",
+              "host": ["{{baseUrl}}"],
+              "path": ["analyze-decision"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Decision Management",
+      "item": [
+        {
+          "name": "Save Decision",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Migrate to PostgreSQL\",\n  \"owner\": \"dev@example.com\",\n  \"rationale\": \"Better performance and ACID compliance needed\",\n  \"due_date\": \"2024-12-31\",\n  \"thread_link\": \"https://slack.com/archives/C123/p1234567890\",\n  \"participants\": [\"dev@example.com\", \"dba@example.com\"],\n  \"channel_id\": \"tech-team\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/save-decision",
+              "host": ["{{baseUrl}}"],
+              "path": ["save-decision"]
+            }
+          }
+        },
+        {
+          "name": "Query Decisions (RAG)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What decisions were made about database migrations?\",\n  \"user\": \"user@example.com\",\n  \"limit\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/query-decisions",
+              "host": ["{{baseUrl}}"],
+              "path": ["query-decisions"]
+            }
+          }
+        },
+        {
+          "name": "Search Decisions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keyword\": \"database\",\n  \"status\": \"Open\",\n  \"limit\": 20\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/search-decisions",
+              "host": ["{{baseUrl}}"],
+              "path": ["search-decisions"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Decision CRUD",
+      "item": [
+        {
+          "name": "List All Decisions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions?limit=20&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Decision by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Decision",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In Progress\",\n  \"rationale\": \"Updated rationale\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/decisions/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Decision",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Completed\",\n  \"user\": \"dev@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/decisions/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Decision History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/:id/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", ":id", "history"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Related Decisions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/:id/related?limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", ":id", "related"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard & Analytics",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "stats"]
+            }
+          }
+        },
+        {
+          "name": "High Risk Decisions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/high-risk",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", "high-risk"]
+            }
+          }
+        },
+        {
+          "name": "Recent Decisions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/recent?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", "recent"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Decisions by Owner",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/by-owner/:owner_email",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", "by-owner", ":owner_email"],
+              "variable": [
+                {
+                  "key": "owner_email",
+                  "value": "dev@example.com"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Decisions by Channel",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/by-channel/:channel_id",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", "by-channel", ":channel_id"],
+              "variable": [
+                {
+                  "key": "channel_id",
+                  "value": "tech-team"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Aging Decisions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/aging?days_threshold=60",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", "aging"],
+              "query": [
+                {
+                  "key": "days_threshold",
+                  "value": "60"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upcoming Due Decisions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/decisions/upcoming-due?days_ahead=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", "upcoming-due"],
+              "query": [
+                {
+                  "key": "days_ahead",
+                  "value": "7"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Decision Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/trends?period=month",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "trends"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "month"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Topic Analysis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/topics",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "topics"]
+            }
+          }
+        },
+        {
+          "name": "Decision Velocity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/velocity?period=month",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "velocity"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "month"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User & Expertise",
+      "item": [
+        {
+          "name": "User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/:user_email",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", ":user_email"],
+              "variable": [
+                {
+                  "key": "user_email",
+                  "value": "dev@example.com"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Expertise Map",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/expertise",
+              "host": ["{{baseUrl}}"],
+              "path": ["expertise"]
+            }
+          }
+        },
+        {
+          "name": "Top Contributors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/top-contributors?limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "top-contributors"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Knowledge Gaps",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/knowledge-gaps",
+              "host": ["{{baseUrl}}"],
+              "path": ["knowledge-gaps"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Risk Assessment",
+      "item": [
+        {
+          "name": "Assess Risk",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision_id\": \"550e8400-e29b-41d4-a716-446655440000\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assess-risk/:decision_id",
+              "host": ["{{baseUrl}}"],
+              "path": ["assess-risk", ":decision_id"],
+              "variable": [
+                {
+                  "key": "decision_id",
+                  "value": "550e8400-e29b-41d4-a716-446655440000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reassess All Risks",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Open\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/decisions/reassess-all-risks",
+              "host": ["{{baseUrl}}"],
+              "path": ["decisions", "reassess-all-risks"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit & Export",
+      "item": [
+        {
+          "name": "Get Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/audit-logs?limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit-logs"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Export Decisions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/export/decisions?format=csv&status=Completed",
+              "host": ["{{baseUrl}}"],
+              "path": ["export", "decisions"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "csv"
+                },
+                {
+                  "key": "status",
+                  "value": "Completed"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Send Reminders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision_id\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"recipient_email\": \"user@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reminders/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["reminders", "send"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Development Utilities",
+      "item": [
+        {
+          "name": "Seed Sample Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"count\": 20\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/dev/seed-data",
+              "host": ["{{baseUrl}}"],
+              "path": ["dev", "seed-data"]
+            }
+          }
+        },
+        {
+          "name": "Clear All Data",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dev/clear-data",
+              "host": ["{{baseUrl}}"],
+              "path": ["dev", "clear-data"]
+            }
+          }
+        },
+        {
+          "name": "Validate Embeddings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"This is a test sentence for embedding validation.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/dev/validate-embeddings",
+              "host": ["{{baseUrl}}"],
+              "path": ["dev", "validate-embeddings"]
+            }
+          }
+        },
+        {
+          "name": "Development Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dev/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["dev", "stats"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
