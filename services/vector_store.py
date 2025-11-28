@@ -5,11 +5,13 @@ import os
 from pathlib import Path
 import logging
 
+from config import Config
+
 class VectorStore:
     def __init__(self):
         self.dimension = 768  # Gemini embedding dimension
-        self.index_path = Path('data/faiss_index.bin')
-        self.metadata_path = Path('data/metadata.pkl')
+        self.index_path = Path(Config.BASE_DIR) / 'data' / 'faiss_index.bin'
+        self.metadata_path = Path(Config.BASE_DIR) / 'data' / 'metadata.pkl'
         
         # Create data directory if it doesn't exist
         self.index_path.parent.mkdir(parents=True, exist_ok=True)

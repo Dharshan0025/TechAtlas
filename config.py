@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
+    # Base Directory
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
     # Gemini API
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
     # Default to Gemini 2.5 Flash model (v1)
