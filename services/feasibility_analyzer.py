@@ -7,6 +7,7 @@ import google.generativeai as genai
 from config import Config
 import logging
 from typing import Dict, List, Any, Tuple
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -162,14 +163,22 @@ Be specific, technical, and actionable in your analysis."""
                 elif current_section == 'risks' and line.startswith('-'):
                     analysis['risks'].append(line[1:].strip())
                 elif current_section == 'alternatives':
-                    if line.startswith('1.') or line.startswith('2.') or line.startswith('3.'):
+                    # Match numbered list items (e.g., "1. Option", "1. **Option**")
+                    alt_match = re.match(r'^\d+\.\s*(?:\*\*)?(.*?)(?:\*\*)?$', line)
+                    if alt_match:
                         if current_alternative:
                             analysis['alternatives'].append(current_alternative)
-                        current_alternative = {"option": line[2:].strip(), "pros": "", "cons": ""}
-                    elif current_alternative and 'Pros:' in line:
-                        current_alternative['pros'] = line.split('Pros:')[1].strip()
-                    elif current_alternative and 'Cons:' in line:
-                        current_alternative['cons'] = line.split('Cons:')[1].strip()
+                        current_alternative = {"option": alt_match.group(1).strip(), "pros": "", "cons": ""}
+                    elif current_alternative:
+                        # Match Pros/Cons with flexible formatting (e.g., "- Pros:", "- **Pros**:", "Pros:")
+                        # Case insensitive, handles optional bullets and bolding
+                        pros_match = re.search(r'(?:-\s*)?(?:\*\*)?pros(?:\*\*)?:\s*(.*)', line, re.IGNORECASE)
+                        cons_match = re.search(r'(?:-\s*)?(?:\*\*)?cons(?:\*\*)?:\s*(.*)', line, re.IGNORECASE)
+                        
+                        if pros_match:
+                            current_alternative['pros'] = pros_match.group(1).strip()
+                        elif cons_match:
+                            current_alternative['cons'] = cons_match.group(1).strip()
                 elif current_section == 'best_practices' and line.startswith('-'):
                     analysis['best_practices'].append(line[1:].strip())
                 elif current_section == 'assessment':
