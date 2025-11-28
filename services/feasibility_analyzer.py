@@ -92,20 +92,20 @@ class FeasibilityAnalyzer:
 
 Please provide a comprehensive analysis in the following format:
 
-**STRENGTHS** (List 3-5 key benefits and advantages):
-- [Strength 1]
-- [Strength 2]
+**STRENGTHS** (List 3-5 key benefits):
+- [Strength 1: Single concise sentence, max 15 words]
+- [Strength 2: Single concise sentence, max 15 words]
 ...
 
-**RISKS** (List 3-5 potential problems and challenges):
-- [Risk 1]
-- [Risk 2]
+**RISKS** (List 3-5 potential problems):
+- [Risk 1: Single concise sentence, max 15 words]
+- [Risk 2: Single concise sentence, max 15 words]
 ...
 
 **ALTERNATIVES** (Suggest 2-3 alternative approaches):
 1. **[Alternative Name]**
-   - Pros: [Single concise sentence highlighting key benefits]
-   - Cons: [Single concise sentence highlighting key drawbacks]
+   - Pros: [Single concise sentence, max 15 words]
+   - Cons: [Single concise sentence, max 15 words]
 
 **BEST PRACTICES** (Industry standards and recommendations):
 - [Practice 1]
@@ -114,7 +114,7 @@ Please provide a comprehensive analysis in the following format:
 **OVERALL ASSESSMENT**:
 [Brief summary and recommendation]
 
-Be specific, technical, and actionable. Ensure pros and cons are single, effective lines."""
+Be specific but EXTREMELY CONCISE. Every bullet point must be a single line. Do not use bolding for the content of the bullet points."""
         
         return prompt
     

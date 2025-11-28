@@ -135,5 +135,4 @@ dmypy.json
 *.swo
 *~
 
-# FAISS vector database
-data/
+
