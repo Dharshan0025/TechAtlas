@@ -151,6 +151,7 @@ def save_decision():
                 "success": False,
                 "error": "Database save failed",
                 "message": "Failed to save decision to Firestore",
+                "details": str(e),
                 "status": 500
             }), 500
         
