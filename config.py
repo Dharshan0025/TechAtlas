@@ -38,8 +38,11 @@ class Config:
         # Method 1: Use JSON string from environment (Railway recommended)
         if Config.FIREBASE_CREDENTIALS_JSON:
             try:
+                val = Config.FIREBASE_CREDENTIALS_JSON
+                print(f"DEBUG: Parsing FIREBASE_CREDENTIALS_JSON. Length: {len(val)}, Start: {val[:20]!r}...")
                 return json.loads(Config.FIREBASE_CREDENTIALS_JSON)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
+                print(f"ERROR: JSON decode error: {e}")
                 raise ValueError("Invalid FIREBASE_CREDENTIALS_JSON format")
         
         # Method 2: Use file path (local development)
