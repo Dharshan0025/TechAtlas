@@ -54,6 +54,7 @@ try:
     from routes.risk import risk_bp
     from routes.audit import audit_bp
     from routes.dev import dev_bp
+    from routes.tracking import tracking_bp
     print("DEBUG: All blueprints imported successfully")
 except Exception as e:
     print(f"ERROR: Failed to import blueprints: {e}")
@@ -158,6 +159,10 @@ try:
     # Development utilities
     app.register_blueprint(dev_bp)
     print("DEBUG: dev_bp registered")
+
+    # Tracking routes
+    app.register_blueprint(tracking_bp)
+    print("DEBUG: tracking_bp registered")
     
     print("DEBUG: All blueprints registered successfully")
 except Exception as e:

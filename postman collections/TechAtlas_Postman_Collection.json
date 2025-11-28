@@ -23,8 +23,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/",
-              "host": ["{{baseUrl}}"],
-              "path": [""]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                ""
+              ]
             }
           }
         },
@@ -35,8 +39,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           }
         },
@@ -47,8 +55,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/routes",
-              "host": ["{{baseUrl}}"],
-              "path": ["routes"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "routes"
+              ]
             }
           }
         },
@@ -59,8 +71,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/version",
-              "host": ["{{baseUrl}}"],
-              "path": ["version"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "version"
+              ]
             }
           }
         }
@@ -85,8 +101,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/detect-decision",
-              "host": ["{{baseUrl}}"],
-              "path": ["detect-decision"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "detect-decision"
+              ]
             }
           }
         },
@@ -106,8 +126,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/analyze-decision",
-              "host": ["{{baseUrl}}"],
-              "path": ["analyze-decision"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analyze-decision"
+              ]
             }
           }
         }
@@ -132,8 +156,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/save-decision",
-              "host": ["{{baseUrl}}"],
-              "path": ["save-decision"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "save-decision"
+              ]
             }
           }
         },
@@ -153,8 +181,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/query-decisions",
-              "host": ["{{baseUrl}}"],
-              "path": ["query-decisions"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "query-decisions"
+              ]
             }
           }
         },
@@ -174,8 +206,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/search-decisions",
-              "host": ["{{baseUrl}}"],
-              "path": ["search-decisions"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "search-decisions"
+              ]
             }
           }
         }
@@ -191,8 +227,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions?limit=20&offset=0",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -213,8 +253,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -240,8 +285,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/decisions/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -258,8 +308,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/:id",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", ":id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                ":id"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -285,8 +340,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/decisions/:id/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", ":id", "status"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                ":id",
+                "status"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -303,8 +364,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/:id/history",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", ":id", "history"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                ":id",
+                "history"
+              ],
               "variable": [
                 {
                   "key": "id",
@@ -321,8 +388,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/:id/related?limit=5",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", ":id", "related"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                ":id",
+                "related"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -350,8 +423,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/dashboard/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["dashboard", "stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dashboard",
+                "stats"
+              ]
             }
           }
         },
@@ -362,8 +440,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/high-risk",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", "high-risk"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                "high-risk"
+              ]
             }
           }
         },
@@ -374,8 +457,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/recent?days=30",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", "recent"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                "recent"
+              ],
               "query": [
                 {
                   "key": "days",
@@ -392,8 +480,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/by-owner/:owner_email",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", "by-owner", ":owner_email"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                "by-owner",
+                ":owner_email"
+              ],
               "variable": [
                 {
                   "key": "owner_email",
@@ -410,8 +504,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/by-channel/:channel_id",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", "by-channel", ":channel_id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                "by-channel",
+                ":channel_id"
+              ],
               "variable": [
                 {
                   "key": "channel_id",
@@ -428,8 +528,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/aging?days_threshold=60",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", "aging"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                "aging"
+              ],
               "query": [
                 {
                   "key": "days_threshold",
@@ -446,8 +551,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/decisions/upcoming-due?days_ahead=7",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", "upcoming-due"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                "upcoming-due"
+              ],
               "query": [
                 {
                   "key": "days_ahead",
@@ -464,8 +574,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/analytics/trends?period=month",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "trends"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "trends"
+              ],
               "query": [
                 {
                   "key": "period",
@@ -482,8 +597,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/analytics/topics",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "topics"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "topics"
+              ]
             }
           }
         },
@@ -494,8 +614,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/analytics/velocity?period=month",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "velocity"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "velocity"
+              ],
               "query": [
                 {
                   "key": "period",
@@ -517,8 +642,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/users/:user_email",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", ":user_email"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                ":user_email"
+              ],
               "variable": [
                 {
                   "key": "user_email",
@@ -535,8 +665,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/expertise",
-              "host": ["{{baseUrl}}"],
-              "path": ["expertise"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "expertise"
+              ]
             }
           }
         },
@@ -547,8 +681,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/users/top-contributors?limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "top-contributors"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "top-contributors"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -565,8 +704,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/knowledge-gaps",
-              "host": ["{{baseUrl}}"],
-              "path": ["knowledge-gaps"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "knowledge-gaps"
+              ]
             }
           }
         }
@@ -591,8 +734,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/assess-risk/:decision_id",
-              "host": ["{{baseUrl}}"],
-              "path": ["assess-risk", ":decision_id"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "assess-risk",
+                ":decision_id"
+              ],
               "variable": [
                 {
                   "key": "decision_id",
@@ -618,8 +766,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/decisions/reassess-all-risks",
-              "host": ["{{baseUrl}}"],
-              "path": ["decisions", "reassess-all-risks"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "decisions",
+                "reassess-all-risks"
+              ]
             }
           }
         }
@@ -635,8 +788,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/audit-logs?limit=50",
-              "host": ["{{baseUrl}}"],
-              "path": ["audit-logs"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "audit-logs"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -653,8 +810,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/export/decisions?format=csv&status=Completed",
-              "host": ["{{baseUrl}}"],
-              "path": ["export", "decisions"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "export",
+                "decisions"
+              ],
               "query": [
                 {
                   "key": "format",
@@ -684,8 +846,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/reminders/send",
-              "host": ["{{baseUrl}}"],
-              "path": ["reminders", "send"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reminders",
+                "send"
+              ]
             }
           }
         }
@@ -710,8 +877,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/dev/seed-data",
-              "host": ["{{baseUrl}}"],
-              "path": ["dev", "seed-data"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dev",
+                "seed-data"
+              ]
             }
           }
         },
@@ -722,8 +894,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/dev/clear-data",
-              "host": ["{{baseUrl}}"],
-              "path": ["dev", "clear-data"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dev",
+                "clear-data"
+              ]
             }
           }
         },
@@ -743,8 +920,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/dev/validate-embeddings",
-              "host": ["{{baseUrl}}"],
-              "path": ["dev", "validate-embeddings"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dev",
+                "validate-embeddings"
+              ]
             }
           }
         },
@@ -755,8 +937,88 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/dev/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["dev", "stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dev",
+                "stats"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tracking",
+      "item": [
+        {
+          "name": "Start Tracking",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"channel_id\": \"test-channel\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tracking/start",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracking",
+                "start"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Stop Tracking",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"channel_id\": \"test-channel\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tracking/stop",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracking",
+                "stop"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tracking Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tracking/status/test-channel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tracking",
+                "status",
+                "test-channel"
+              ]
             }
           }
         }
