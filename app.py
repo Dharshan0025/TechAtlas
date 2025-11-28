@@ -39,6 +39,8 @@ try:
 except Exception as e:
     print(f"ERROR: Firebase initialization failed: {e}")
     traceback.print_exc()
+    # Critical error: cannot start without Firebase
+    raise e
 
 # Import all blueprints
 try:
