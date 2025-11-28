@@ -104,8 +104,8 @@ Please provide a comprehensive analysis in the following format:
 
 **ALTERNATIVES** (Suggest 2-3 alternative approaches):
 1. **[Alternative Name]**
-   - Pros: [Benefits]
-   - Cons: [Drawbacks]
+   - Pros: [Single concise sentence highlighting key benefits]
+   - Cons: [Single concise sentence highlighting key drawbacks]
 
 **BEST PRACTICES** (Industry standards and recommendations):
 - [Practice 1]
@@ -114,7 +114,7 @@ Please provide a comprehensive analysis in the following format:
 **OVERALL ASSESSMENT**:
 [Brief summary and recommendation]
 
-Be specific, technical, and actionable in your analysis."""
+Be specific, technical, and actionable. Ensure pros and cons are single, effective lines."""
         
         return prompt
     
